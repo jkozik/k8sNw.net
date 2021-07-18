@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nwnet
+  labels:
+    app: nwnet
+spec:
+  selector:
+    matchLabels:
+      app: nwnet
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nwnet
+    spec:
+      containers:
+      - image: jkozik/nw.net:v1
+        name: nwnet
+        ports:
+        - containerPort: 80
+          name: nwnet
+        volumeMounts:
+        - name: nwcom-persistent-storage
+          mountPath: "/var/www/html/mount" 
+      volumes:
+      - name: nwcom-persistent-storage
+        persistentVolumeClaim:
+          claimName: nwcom-persistent-storage
