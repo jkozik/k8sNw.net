@@ -41,3 +41,46 @@ ingress.networking.k8s.io/nwnet-ingress created
 service/nwnet created
 ```
 
+```
+[jkozik@dell2 k8sNw.net]$ kubectl get deployment,service,pod,ingress,pv,pvc
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/nwcom                 1/1     1            1           20h
+deployment.apps/nwnet                 1/1     1            1           2m59s
+
+NAME                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/nwcom             NodePort    10.100.137.46    <none>        80:31241/TCP   20h
+service/nwnet             NodePort    10.108.118.250   <none>        80:30557/TCP   2m57s
+
+NAME                                       READY   STATUS    RESTARTS   AGE
+pod/nwcom-5d55cd57b6-jjc4t                 1/1     Running   0          20h
+pod/nwnet-77785d54c8-kt9mm                 1/1     Running   0          2m59s
+
+NAME                                                CLASS    HOSTS                     ADDRESS           PORTS   AGE
+ingress.networking.k8s.io/nwcom-ingress             <none>   napervilleweather.com     192.168.100.174   80      20h
+ingress.networking.k8s.io/nwnet-ingress             <none>   napervillesweather.net    192.168.100.174   80      2m59s
+
+NAME                                            CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                  STORAGECLASS   REASON   AGE
+persistentvolume/nwcom-persistent-storage       1Gi        ROX            Retain           Bound    default/nwcom-persistent-storage       nfs                     20h
+
+NAME                                                 STATUS   VOLUME                         CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/nwcom-persistent-storage       Bound    nwcom-persistent-storage       1Gi        ROX            nfs            20h
+```
+
+```
+</html>[jkozik@dell2 k8sNw.net]$ curl -H "Host: napervilleweather.net" 192.168.100.173:30140 | head
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Naperville, IL USA Smart Home Weather Station</title>
+  <meta content="Smart Home weather station providing current weather conditions for Naperville, IL USA" name="description">
+  <meta content="website" property="og:type">
+  <meta content="7 days" name="revisit-after">
+  <meta content="web" name="distribution">
+  <meta content="Naperville, IL USA
+100  8026    0  8026    0     0    99k      0 --:--:-- --:--:-- --:--:--  101k
+curl: (23) Failed writing body (166 != 4090)
+[jkozik@dell2 k8sNw.net]$
+```
