@@ -23,3 +23,21 @@ cc0f976c1376: Mounted from jkozik/nw.com
 ffc9b21953f4: Mounted from jkozik/nw.com
 v1: digest: sha256:0bdaf68ce13c7393dc8aca9b15783b0859767c3c3ac21e8b9eb25bae9743058b size: 4082
 ```
+```
+[jkozik@dell2 ~]$ git clone https://github.com/jkozik/k8sNw.net
+Cloning into 'k8sNw.net'...
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 11 (delta 0), reused 5 (delta 0), pack-reused 0
+Unpacking objects: 100% (11/11), done.
+
+[jkozik@dell2 ~]$ cd k8sNw.net
+[jkozik@dell2 k8sNw.net]$ ls
+nwnet-deploy.yml  nwnet-ingress.yml  nwnet-svc.yml  README.md
+[jkozik@dell2 k8sNw.net]$ kubectl apply -f .
+deployment.apps/nwnet created
+ingress.networking.k8s.io/nwnet-ingress created
+service/nwnet created
+```
+
