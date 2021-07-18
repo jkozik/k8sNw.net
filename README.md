@@ -67,6 +67,11 @@ persistentvolumeclaim/nwcom-persistent-storage       Bound    nwcom-persistent-s
 ```
 
 ```
+[jkozik@dell2 k8sNw.net]$ kubectl -n ingress-nginx get service
+NAME                                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+ingress-nginx-controller             NodePort    10.97.70.29     <none>        80:30140/TCP,443:30023/TCP   22d
+ingress-nginx-controller-admission   ClusterIP   10.111.250.10   <none>        443/TCP
+
 </html>[jkozik@dell2 k8sNw.net]$ curl -H "Host: napervilleweather.net" 192.168.100.173:30140 | head
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
