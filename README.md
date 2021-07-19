@@ -1,4 +1,11 @@
 # k8sNw.net
+
+Setup napervilleweather.net in a kubernetes cluster as deployment named nwnet; expose as service nwnet; connect to the internet as napervilleweather.net through an ingress called nwnet-ingress. Get realtime weather data from an NFS mount on my local host through the PV/PVC named nwcom-persistent-storage -- note, this is the same PV/PVC used by [k8sNw.com](https://github.com/jkozik/k8sNw.com). 
+
+Source image [InstallNW.net](https://github.com/jkozik/InstallNW.net)
+
+# Build image, put on docker hub
+NapervilleWeather.net is running in a docker container on my host, directly -- not in a VM.  To make it run in my kubernetes cluster, I need to push the image to my dockerhub repository.  The kubernetes deployment resource has an "image" field that triggers a pull from dockerhub.
 ```
 [jkozik@dell2 k8sNw.net]$ docker tag jkozik/nw.net jkozik/nw.net:v1
 [jkozik@dell2 k8sNw.net]$ docker push jkozik/nw.net:v1
@@ -23,6 +30,9 @@ cc0f976c1376: Mounted from jkozik/nw.com
 ffc9b21953f4: Mounted from jkozik/nw.com
 v1: digest: sha256:0bdaf68ce13c7393dc8aca9b15783b0859767c3c3ac21e8b9eb25bae9743058b size: 4082
 ```
+# Clone github repository, apply yaml files
+
+Get the yaml manifest files and apply them.  Verify that the pod, deployment, service and ingress are successfully running.
 ```
 [jkozik@dell2 ~]$ git clone https://github.com/jkozik/k8sNw.net
 Cloning into 'k8sNw.net'...
@@ -40,7 +50,7 @@ deployment.apps/nwnet created
 ingress.networking.k8s.io/nwnet-ingress created
 service/nwnet created
 ```
-
+# Verify that pod, service, deployment and ingress resources running
 ```
 [jkozik@dell2 k8sNw.net]$ kubectl get deployment,service,pod,ingress,pv,pvc
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
@@ -65,13 +75,16 @@ persistentvolume/nwcom-persistent-storage       1Gi        ROX            Retain
 NAME                                                 STATUS   VOLUME                         CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 persistentvolumeclaim/nwcom-persistent-storage       Bound    nwcom-persistent-storage       1Gi        ROX            nfs            20h
 ```
-
+## HomeLAN NATing from external IP address / port 80 to cluster's LAN address and ingress controller's port number.
+So, on my home LAN http://192.168.100.174:30410 is where incoming web traffic enters.  The ingress controller parses for napervilleweather.com and redirects the traffic to the nwcom service. I have an external IP address for my home LAN that gets NAT'd by my home router to 192.168.100.174.  On that NAT box, I map port 80 to port 30410. As you can see from the get ingress command, I also am running a wordpress application with another URL, but also mapped to the same IP address and port number.  The ingress control does a reverse proxy function and splits the wordpress traffic off to the nginx-wordpress-ingress resource.
 ```
 [jkozik@dell2 k8sNw.net]$ kubectl -n ingress-nginx get service
 NAME                                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
 ingress-nginx-controller             NodePort    10.97.70.29     <none>        80:30140/TCP,443:30023/TCP   22d
 ingress-nginx-controller-admission   ClusterIP   10.111.250.10   <none>        443/TCP
-
+```
+## Check the web page http://napervilleweather.net
+```
 </html>[jkozik@dell2 k8sNw.net]$ curl -H "Host: napervilleweather.net" 192.168.100.173:30140 | head
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -86,6 +99,4 @@ ingress-nginx-controller-admission   ClusterIP   10.111.250.10   <none>        4
   <meta content="web" name="distribution">
   <meta content="Naperville, IL USA
 100  8026    0  8026    0     0    99k      0 --:--:-- --:--:-- --:--:--  101k
-curl: (23) Failed writing body (166 != 4090)
-[jkozik@dell2 k8sNw.net]$
 ```
