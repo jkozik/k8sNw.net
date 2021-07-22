@@ -4,7 +4,12 @@ metadata:
   name: nwnet-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
+  tls:
+  - hosts:
+    - napervilleweather.net
+    secretName: napervilleweather-net-tls
   rules:
   - host: napervilleweather.net
     http:
