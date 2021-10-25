@@ -100,3 +100,56 @@ ingress-nginx-controller-admission   ClusterIP   10.111.250.10   <none>        4
   <meta content="Naperville, IL USA
 100  8026    0  8026    0     0    99k      0 --:--:-- --:--:-- --:--:--  101k
 ```
+## napervilleweather.net/weewx
+In the repository [weewx](https://github.com/jkozik/weewx), I added an ingress to permit the weewx based weather software run as a separate path.  Thus [napervilleweather.net/weewx](https://napervilleweather.net/weewx) will display the same weather data but under the weewx weather software tool and graphing mechanism.  
+
+Note: to do this, I updated the [nwnet-weewx-ingress.yaml](nwnet-weewx-ingress.yaml) file in the weewx repository to replace the one in this repository.  See the contents of it below:
+```
+[jkozik@dell2 weewx]$ cat nwnet-weewx-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nwnet-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/weewx)$ $1/ redirect;
+      rewrite ^(/nwnet)$ $1/ redirect;
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - napervilleweather.net
+    secretName: napervilleweather-net-tls
+  rules:
+  - host: napervilleweather.net
+    http:
+      paths:
+      - path: /nwnet/(.*)
+      #- path: /nwnet(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: nwnet
+            port:
+              number: 80
+     # - path: /weewx(/|$)(.*)
+      #- path: /weewx(/|$)(.*)
+      - path: /weewx/(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: weewx
+            port:
+              number: 80
+      - path: /(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: nwnet
+            port:
+              number: 80
+
+[jkozik@dell2 weewx]$
+```
