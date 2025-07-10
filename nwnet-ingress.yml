@@ -4,15 +4,8 @@ metadata:
   name: nwnet-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-      #kubernetes.io/ingress.class: nginx
-    #cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  #tls:
-  #- hosts:
-    #- napervilleweather.net
-    #secretName: napervilleweather-net-tls
   rules:
   - host: napervilleweather.net
     http:
