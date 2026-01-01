@@ -153,3 +153,9 @@ spec:
 
 [jkozik@dell2 weewx]$
 ```
+## Ingress --> HttpRoute
+I have installed the Gateway API on this cluster.  It is called ` Gateway running in `envoy-gateway-system` namespace.
+
+The HTTPRoute yaml points napervilleweather.net and www.naperweather.net from my Cloudflare tunnel to port 30458.
+
+Ingress has been depricated.
