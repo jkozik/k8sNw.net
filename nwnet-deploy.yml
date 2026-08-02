@@ -5,6 +5,7 @@ metadata:
   labels:
     app: nwnet
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: nwnet
@@ -15,6 +16,13 @@ spec:
       labels:
         app: nwnet
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: nwnet
+            topologyKey: kubernetes.io/hostname      
       containers:
       - image: jkozik/nw.net:v1
         name: nwnet
